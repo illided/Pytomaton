@@ -142,7 +142,7 @@ def construct_fnda(regexp: str) -> NonDeterministicAutomata:
 
 def convert_to_fda(fnda: NonDeterministicAutomata) -> DeterministicAutomata:
     links = []
-    newStates = [set(fnda.states)]
+    newStates = [set(fnda.eps_close(0))]
     visitedStates = []
     alphabet = [x for x in list(fnda.table.keys()) if x != EPSILON]
     while len(newStates) > 0:
