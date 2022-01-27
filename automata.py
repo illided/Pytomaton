@@ -37,12 +37,12 @@ class NonDeterministicAutomata(Automata):
         return self.table[char][state]
 
     def forward(self, old_state, char: str):
-        new_state = []
+        new_state = set()
         for state in old_state:
-            new_state.extend(self.next_state(state, char))
+            new_state.update(self.next_state(state, char))
             if EPSILON in self.table.keys():
-                new_state.extend(sum([self.eps_close(s) for s in new_state], []))
-        return list(set(new_state))
+                new_state.update(sum([self.eps_close(s) for s in new_state], []))
+        return list(new_state)
 
     def add_transition(self, start, char, finish):
         if char not in self.table:
@@ -85,7 +85,7 @@ class NonDeterministicAutomata(Automata):
             for s in active:
                 new_active.extend(self.table[EPSILON][s])
             visited = list(set(visited + active))
-            active = list(set(new_active))
+            active = list(set(new_active).difference(visited))
         return visited
 
     def alphabet(self):
