@@ -14,13 +14,22 @@ class Automata:
     def accepts(self, input_string: str) -> bool:
         raise NotImplementedError()
 
+    def num_of_states(self):
+        raise NotImplementedError()
+
+    def print_table(self):
+        raise NotImplementedError()
+
+    def alphabet(self):
+        raise NotImplementedError()
+
 
 class NonDeterministicAutomata(Automata):
     def __init__(self, table: NFDA_table, final_states: List[int]):
         self.table = table
         self.final_states = final_states
 
-        self.states = self.eps_close(0)
+        self.states = None
 
     def next_state(self, state: int, char: str) -> List[int]:
         if char not in self.table:
@@ -79,10 +88,14 @@ class NonDeterministicAutomata(Automata):
             active = list(set(new_active))
         return visited
 
+    def alphabet(self):
+        return list(self.table.keys())
+
 
 class DeterministicAutomata(Automata):
     def __init__(self, table: FDA_table, final_states: List[int]):
         self.table = table
+        self.final_states = final_states
         proxy_table = {}
         for char, states in table.items():
             proxy_table[char] = [[state] if state is not None else [] for state in states]
@@ -93,3 +106,9 @@ class DeterministicAutomata(Automata):
 
     def print_table(self):
         self.proxy.print_table()
+
+    def num_of_states(self):
+        return self.proxy.num_of_states()
+
+    def alphabet(self):
+        return self.proxy.alphabet()
