@@ -196,6 +196,7 @@ def convert_to_fda(fnda: NonDeterministicAutomata) -> DeterministicAutomata:
         new_table[link[1]][link[0]] = link[2]
     return DeterministicAutomata(table=new_table, final_states=new_final)
 
+
 def minimize_fda(fda: DeterministicAutomata) -> DeterministicAutomata:
     def split_set(target, splitter, split_char) -> Tuple[set, set]:
         R1 = set()
