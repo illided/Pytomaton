@@ -45,18 +45,10 @@ def alternate(A: NonDeterministicAutomata, B: NonDeterministicAutomata) -> NonDe
 
 
 def star(A: NonDeterministicAutomata) -> NonDeterministicAutomata:
-    shifted_finals = [f + 1 for f in A.final_states]
-    shifted_table = {}
-    for char, state_list in A.table.items():
-        shifted_table[char] = [[]] + [[state + 1 for state in states] for states in state_list] + [[]]
-    new = NonDeterministicAutomata(table=shifted_table, final_states=[])
-    for f in shifted_finals:
-        new.add_transition(f, EPSILON, 1)
-        new.add_transition(f, EPSILON, new.num_of_states() - 1)
-    new.add_transition(0, EPSILON, 1)
-    new.add_transition(0, EPSILON, new.num_of_states() - 1)
-    new.final_states = [new.num_of_states() - 1]
-    return new
+    A_optional = optional(A)
+    for f in A_optional.final_states:
+        A_optional.add_transition(f, EPSILON, 0)
+    return A_optional
 
 
 def plus(A: NonDeterministicAutomata) -> NonDeterministicAutomata:
@@ -65,6 +57,13 @@ def plus(A: NonDeterministicAutomata) -> NonDeterministicAutomata:
 
 def generalized_iteration(A: NonDeterministicAutomata, B: NonDeterministicAutomata) -> NonDeterministicAutomata:
     return concatenate(A, star(concatenate(A, B)))
+
+
+def optional(A: NonDeterministicAutomata) -> NonDeterministicAutomata:
+    A_copy = A.copy()
+    for f in A_copy.final_states:
+        A_copy.add_transition(0, EPSILON, f)
+    return A_copy
 
 
 def primitive_fnda(actual_string: str) -> NonDeterministicAutomata:
@@ -81,18 +80,20 @@ operations = {
     '+': plus,
     ';': alternate,
     ',': concatenate,
-    '#': generalized_iteration
+    '#': generalized_iteration,
+    '?': optional
 }
 priorities = {
     ';': 0,
     '#': 1,
     ',': 1,
     '*': 2,
-    '+': 2
+    '+': 2,
+    '?': 2
 }
 
 binary = [';', '#', ',']
-unary = ['*', '+']
+unary = ['*', '+', '?']
 
 
 def is_character(c):
