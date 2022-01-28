@@ -64,7 +64,7 @@ def plus(A: NonDeterministicAutomata) -> NonDeterministicAutomata:
 
 
 def generalized_iteration(A: NonDeterministicAutomata, B: NonDeterministicAutomata) -> NonDeterministicAutomata:
-    return concatenate(A, star(concatenate(A, B)))
+    return concatenate(A, star(concatenate(B, A)))
 
 
 def optional(A: NonDeterministicAutomata) -> NonDeterministicAutomata:
