@@ -45,10 +45,18 @@ def alternate(A: NonDeterministicAutomata, B: NonDeterministicAutomata) -> NonDe
 
 
 def star(A: NonDeterministicAutomata) -> NonDeterministicAutomata:
-    A_optional = optional(A)
-    for f in A_optional.final_states:
-        A_optional.add_transition(f, EPSILON, 0)
-    return A_optional
+    shifted_finals = [f + 1 for f in A.final_states]
+    shifted_table = {}
+    for char, state_list in A.table.items():
+        shifted_table[char] = [[]] + [[state + 1 for state in states] for states in state_list] + [[]]
+    new = NonDeterministicAutomata(table=shifted_table, final_states=[])
+    for f in shifted_finals:
+        new.add_transition(f, EPSILON, 1)
+        new.add_transition(f, EPSILON, new.num_of_states() - 1)
+    new.add_transition(0, EPSILON, 1)
+    new.add_transition(0, EPSILON, new.num_of_states() - 1)
+    new.final_states = [new.num_of_states() - 1]
+    return new
 
 
 def plus(A: NonDeterministicAutomata) -> NonDeterministicAutomata:
